@@ -55,8 +55,6 @@ const API_BASE =
     ? "http://127.0.0.1:8000"
     : "";
 let livePoll;
-let crowdMap;
-let crowdLayer;
 
 function riskColor(risk) {
   if (risk === "high") return "linear-gradient(135deg, rgba(184,82,69,.46), rgba(91,36,31,.28))";
@@ -80,52 +78,70 @@ function renderSectors(sectorData = sectors, multiplier = 1) {
     .join("");
 }
 
-function initializeCrowdMap() {
-  if (crowdMap || !window.L) return;
-  crowdMap = L.map("crowdMap", {
-    center: [25.4307, 81.8848],
-    zoom: 13,
-    scrollWheelZoom: false
-  });
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 18,
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(crowdMap);
-  crowdLayer = L.layerGroup().addTo(crowdMap);
+function projectZone(sector) {
+  const bounds = {
+    minLat: 25.416,
+    maxLat: 25.459,
+    minLng: 81.831,
+    maxLng: 81.895
+  };
+  const x = ((sector.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 1000;
+  const y = (1 - (sector.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * 560;
+  return {
+    x: Math.max(70, Math.min(930, x)),
+    y: Math.max(70, Math.min(490, y))
+  };
 }
 
-function renderCrowdMap(sectorData = sectors, mapCenter = [25.4307, 81.8848]) {
-  initializeCrowdMap();
-  if (!crowdMap || !crowdLayer) {
-    byId("crowdMap").innerHTML = "<div class=\"heat-label\">Map tiles loading. Live crowd data is available in the sector cards below.</div>";
-    return;
-  }
+function renderCrowdMap(sectorData = sectors) {
+  const density = sectorData
+    .map((sector) => {
+      const point = projectZone(sector);
+      const radius = Math.max(56, Math.min(128, 34 + (sector.load || 0)));
+      return `
+        <circle
+          class="map-density ${sector.risk}"
+          cx="${point.x.toFixed(1)}"
+          cy="${point.y.toFixed(1)}"
+          r="${radius}"
+          data-name="${sector.name}"
+          data-load="${sector.load}"
+          data-people="${(sector.people_estimate || 0).toLocaleString()}"
+          data-advisory="${sector.advisory || "Monitor crowd movement."}"
+        />
+      `;
+    })
+    .join("");
 
-  crowdLayer.clearLayers();
-  crowdMap.setView(mapCenter, 13);
-  sectorData.forEach((sector) => {
-    const load = sector.load || 0;
-    const size = Math.max(34, Math.min(86, 24 + load * 0.72));
-    const marker = L.divIcon({
-      className: "",
-      html: `<div class="crowd-marker ${sector.risk}" style="width:${size}px;height:${size}px">${load}%</div>`,
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2]
+  byId("crowdMap").innerHTML = `
+    <div class="map-tooltip" id="mapTooltip"></div>
+    <svg viewBox="0 0 1000 560" role="img" aria-label="Prayagraj live crowd heatmap">
+      <rect width="1000" height="560" fill="#020817" />
+      <g opacity="0.6">
+        ${Array.from({ length: 12 }, (_, i) => `<path class="map-road" d="M ${40 + i * 86} 0 L ${10 + i * 72} 560" />`).join("")}
+        ${Array.from({ length: 9 }, (_, i) => `<path class="map-road" d="M 0 ${40 + i * 62} C 220 ${80 + i * 38}, 420 ${i % 2 ? 10 : 120}, 1000 ${65 + i * 55}" />`).join("")}
+        <path class="map-road major" d="M 58 388 C 238 318, 370 302, 520 238 C 638 188, 776 158, 960 120" />
+        <path class="map-road major" d="M 140 90 C 248 186, 330 260, 480 326 C 650 398, 760 442, 930 520" />
+        <path class="map-road major" d="M 72 462 C 230 420, 420 420, 600 368 C 770 318, 850 278, 970 270" />
+      </g>
+      <path class="map-river" d="M 620 0 C 660 74, 672 128, 646 192 C 620 256, 658 318, 748 356 C 834 392, 908 426, 1000 528 L 1000 0 Z" />
+      <path class="map-river" d="M 0 66 C 132 112, 232 112, 360 76 C 480 42, 538 54, 620 0 L 770 0 C 676 78, 548 120, 406 128 C 238 138, 126 154, 0 210 Z" opacity="0.78" />
+      <text class="map-label" x="72" y="252">CHOWK</text>
+      <text class="map-label" x="268" y="336">Kydganj</text>
+      <text class="map-label" x="650" y="218">SANGAM</text>
+      <text class="map-label" x="716" y="328">Arail</text>
+      <text class="map-label" x="104" y="144">Civil Lines</text>
+      <g>${density}</g>
+    </svg>
+  `;
+
+  const tooltip = byId("mapTooltip");
+  byId("crowdMap").querySelectorAll(".map-density").forEach((circle) => {
+    circle.addEventListener("mouseenter", () => {
+      tooltip.innerHTML = `<strong>${circle.dataset.name}</strong>${circle.dataset.load}% load · ${circle.dataset.people} people<br>${circle.dataset.advisory}`;
+      tooltip.classList.add("is-visible");
     });
-    L.marker([sector.lat, sector.lng], { icon: marker })
-      .bindPopup(
-        `<b>${sector.name}</b><br>${load}% load · ${(sector.people_estimate || 0).toLocaleString()} people<br>${sector.advisory || "Monitor crowd movement."}`
-      )
-      .addTo(crowdLayer);
-
-    L.circle([sector.lat, sector.lng], {
-      radius: 90 + load * 8,
-      color: sector.risk === "high" ? "#b85245" : sector.risk === "medium" ? "#c9963d" : "#80a86b",
-      fillColor: sector.risk === "high" ? "#b85245" : sector.risk === "medium" ? "#c9963d" : "#80a86b",
-      fillOpacity: 0.18,
-      opacity: 0.32,
-      weight: 1
-    }).addTo(crowdLayer);
+    circle.addEventListener("mouseleave", () => tooltip.classList.remove("is-visible"));
   });
 }
 
