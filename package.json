@@ -1,0 +1,19 @@
+{
+  "name": "mahakumbh-command-center",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Event Operations Command Center Dashboard for Mahakumbh Innovation Hackathon 2028.",
+  "scripts": {
+    "dev": "npx serve .",
+    "check": "node --check app.js"
+  },
+  "keywords": [
+    "event-operations",
+    "command-center",
+    "mahakumbh",
+    "dashboard",
+    "incident-response"
+  ],
+  "author": "Mahakumbh Innovation Hackathon 2028 Round 2",
+  "license": "MIT"
+}

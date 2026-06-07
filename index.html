@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Centralized event operations command center dashboard for Mahakumbh 2028."
+    />
+    <title>Sangam Setu Command Center</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Command center navigation">
+        <div class="brand">
+          <span class="brand-mark">SS</span>
+          <div>
+            <p class="eyebrow">Mahakumbh 2028</p>
+            <h1>Sangam Setu</h1>
+          </div>
+        </div>
+        <nav>
+          <a href="#overview" class="active">Live Overview</a>
+          <a href="#movement">Crowd Movement</a>
+          <a href="#incidents">Incidents</a>
+          <a href="#resources">Resources</a>
+          <a href="#briefing">AI Briefing</a>
+        </nav>
+        <div class="shift-card">
+          <p class="eyebrow">Current Shift</p>
+          <strong>Sector Control Alpha</strong>
+          <span>05:30-13:30 IST</span>
+          <button id="simulateBtn" type="button">Simulate 15 min</button>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Round 2 Challenge</p>
+            <h2>Event Operations Command Center</h2>
+          </div>
+          <div class="status-strip" aria-label="System status">
+            <span><i class="dot green"></i> Data mesh healthy</span>
+            <span><i class="dot amber"></i> 3 watch zones</span>
+            <span id="clock">06:45 IST</span>
+          </div>
+        </header>
+
+        <section class="hero" id="overview">
+          <div class="hero-copy">
+            <p class="eyebrow">Unified operations picture</p>
+            <h2>One screen for crowd, transport, incidents, volunteers, and supplies.</h2>
+            <p>
+              Built for administrators who need fast decisions during high-density
+              pilgrimage movement near ghats, stations, parking hubs, and medical posts.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <button id="openIncidentBtn" type="button">Log Incident</button>
+            <button id="downloadBriefBtn" class="secondary" type="button">Export Brief</button>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="Key event metrics">
+          <article class="metric-card">
+            <span>Crowd Load</span>
+            <strong id="crowdMetric">72%</strong>
+            <small>Across 9 monitored sectors</small>
+          </article>
+          <article class="metric-card">
+            <span>Open Incidents</span>
+            <strong id="incidentMetric">18</strong>
+            <small>4 high priority, 11 assigned</small>
+          </article>
+          <article class="metric-card">
+            <span>Bus Turnaround</span>
+            <strong id="busMetric">11m</strong>
+            <small>Target under 14 minutes</small>
+          </article>
+          <article class="metric-card">
+            <span>Volunteer Coverage</span>
+            <strong id="volunteerMetric">86%</strong>
+            <small>432 active, 62 redeployable</small>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel map-panel" id="movement">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Crowd movement</p>
+                <h3>Sector Heatmap</h3>
+              </div>
+              <select id="scenarioSelect" aria-label="Scenario">
+                <option value="normal">Morning flow</option>
+                <option value="surge">Royal bath surge</option>
+                <option value="rain">Rain diversion</option>
+              </select>
+            </div>
+            <div class="map" id="sectorMap" aria-label="Operational sector heatmap"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Decision support</p>
+                <h3>Recommended Actions</h3>
+              </div>
+              <span class="tag">Updated now</span>
+            </div>
+            <div id="actionsList" class="actions-list"></div>
+          </article>
+
+          <article class="panel" id="incidents">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Incident desk</p>
+                <h3>Priority Queue</h3>
+              </div>
+              <button id="sortIncidentsBtn" class="ghost" type="button">Sort by SLA</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Zone</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>SLA</th>
+                  </tr>
+                </thead>
+                <tbody id="incidentTable"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel" id="resources">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Resources</p>
+                <h3>Deployment Board</h3>
+              </div>
+              <span class="tag">432 people live</span>
+            </div>
+            <div id="resourceBoard" class="resource-board"></div>
+          </article>
+        </section>
+
+        <section class="briefing-panel" id="briefing">
+          <div>
+            <p class="eyebrow">AI-assisted briefing</p>
+            <h3>Next 30 minutes</h3>
+          </div>
+          <p id="briefingText">
+            Crowd pressure is rising near Sangam Nose and Sector 4 pontoon bridge.
+            Keep one medical quick-response unit staged at Gate 7 and release three
+            volunteer teams from the low-load parking corridor.
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="incidentDialog">
+      <form method="dialog" class="incident-form">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">New field report</p>
+            <h3>Log Incident</h3>
+          </div>
+          <button value="cancel" class="ghost" type="submit">Close</button>
+        </div>
+        <label>
+          Zone
+          <select id="incidentZone">
+            <option>Sangam Nose</option>
+            <option>Gate 7</option>
+            <option>Rail Shuttle Hub</option>
+            <option>Sector 4 Bridge</option>
+          </select>
+        </label>
+        <label>
+          Type
+          <select id="incidentType">
+            <option>Crowd pressure</option>
+            <option>Medical assistance</option>
+            <option>Lost person</option>
+            <option>Transport delay</option>
+          </select>
+        </label>
+        <label>
+          Field note
+          <textarea id="incidentNote" rows="4" placeholder="Short, factual note for command desk"></textarea>
+        </label>
+        <button id="submitIncidentBtn" type="button">Add to Queue</button>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
