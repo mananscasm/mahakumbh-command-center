@@ -14,9 +14,9 @@
     <div class="shell">
       <aside class="sidebar" aria-label="Command center navigation">
         <div class="brand">
-          <span class="brand-mark">SS</span>
+          <span class="brand-mark">सेतु</span>
           <div>
-            <p class="eyebrow">Mahakumbh 2028</p>
+            <p class="eyebrow">Prayagraj Integrated Ops</p>
             <h1>Sangam Setu</h1>
           </div>
         </div>
@@ -31,6 +31,10 @@
           <p class="eyebrow">Current Shift</p>
           <strong>Sector Control Alpha</strong>
           <span>05:30-13:30 IST</span>
+          <div class="shift-meta">
+            <small>Duty Officer</small>
+            <b>ADM Ops Desk</b>
+          </div>
           <button id="simulateBtn" type="button">Simulate 15 min</button>
         </div>
       </aside>
@@ -38,11 +42,11 @@
       <main>
         <header class="topbar">
           <div>
-            <p class="eyebrow">Round 2 Challenge</p>
+            <p class="eyebrow">Round 2 Challenge · Expert Hire</p>
             <h2>Event Operations Command Center</h2>
           </div>
           <div class="status-strip" aria-label="System status">
-            <span><i class="dot green"></i> Data mesh healthy</span>
+            <span><i class="dot green"></i> 14 feeds live</span>
             <span><i class="dot amber"></i> 3 watch zones</span>
             <span id="clock">06:45 IST</span>
           </div>
@@ -51,10 +55,10 @@
         <section class="hero" id="overview">
           <div class="hero-copy">
             <p class="eyebrow">Unified operations picture</p>
-            <h2>One screen for crowd, transport, incidents, volunteers, and supplies.</h2>
+            <h2>One operating picture for crowd, transport, incidents, volunteers, and supplies.</h2>
             <p>
-              Built for administrators who need fast decisions during high-density
-              pilgrimage movement near ghats, stations, parking hubs, and medical posts.
+              Built for administrators who need clear next actions during high-density
+              movement near ghats, rail heads, parking hubs, and medical posts.
             </p>
           </div>
           <div class="hero-actions">
@@ -67,7 +71,7 @@
           <article class="metric-card">
             <span>Crowd Load</span>
             <strong id="crowdMetric">72%</strong>
-            <small>Across 9 monitored sectors</small>
+            <small>9 monitored sectors · 2 rising</small>
           </article>
           <article class="metric-card">
             <span>Open Incidents</span>
@@ -77,7 +81,7 @@
           <article class="metric-card">
             <span>Bus Turnaround</span>
             <strong id="busMetric">11m</strong>
-            <small>Target under 14 minutes</small>
+            <small>Target under 14m · rail hub</small>
           </article>
           <article class="metric-card">
             <span>Volunteer Coverage</span>
@@ -91,13 +95,18 @@
             <div class="panel-heading">
               <div>
                 <p class="eyebrow">Crowd movement</p>
-                <h3>Sector Heatmap</h3>
+                <h3>Sector Operating Map</h3>
               </div>
               <select id="scenarioSelect" aria-label="Scenario">
                 <option value="normal">Morning flow</option>
                 <option value="surge">Royal bath surge</option>
                 <option value="rain">Rain diversion</option>
               </select>
+            </div>
+            <div class="map-legend" aria-label="Map legend">
+              <span><i class="legend high"></i>Hold</span>
+              <span><i class="legend medium"></i>Watch</span>
+              <span><i class="legend low"></i>Normal</span>
             </div>
             <div class="map" id="sectorMap" aria-label="Operational sector heatmap"></div>
           </article>
@@ -159,6 +168,7 @@
             Keep one medical quick-response unit staged at Gate 7 and release three
             volunteer teams from the low-load parking corridor.
           </p>
+          <span class="briefing-source">Synthesized from density, incident SLA, bus GPS, and volunteer check-in feeds.</span>
         </section>
       </main>
     </div>

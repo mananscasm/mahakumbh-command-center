@@ -50,6 +50,8 @@ vercel --prod
 ├── styles.css
 ├── app.js
 ├── vercel.json
+├── decks/
+│   └── sangam-setu-command-center.pptx
 ├── docs/
 │   ├── architecture.md
 │   ├── product-thinking.md

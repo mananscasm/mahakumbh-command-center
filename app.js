@@ -50,9 +50,9 @@ const recommendations = [
 const byId = (id) => document.getElementById(id);
 
 function riskColor(risk) {
-  if (risk === "high") return "linear-gradient(135deg, rgba(239,68,68,.48), rgba(127,29,29,.32))";
-  if (risk === "medium") return "linear-gradient(135deg, rgba(245,158,11,.42), rgba(120,53,15,.28))";
-  return "linear-gradient(135deg, rgba(34,197,94,.28), rgba(20,83,45,.22))";
+  if (risk === "high") return "linear-gradient(135deg, rgba(184,82,69,.46), rgba(91,36,31,.28))";
+  if (risk === "medium") return "linear-gradient(135deg, rgba(201,150,61,.42), rgba(94,68,24,.28))";
+  return "linear-gradient(135deg, rgba(128,168,107,.3), rgba(49,78,43,.24))";
 }
 
 function renderSectors(multiplier = 1) {
