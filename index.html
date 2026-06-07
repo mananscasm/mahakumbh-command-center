@@ -101,13 +101,16 @@
                 <option value="normal">Morning flow</option>
                 <option value="surge">Royal bath surge</option>
                 <option value="rain">Rain diversion</option>
+                <option value="heatwave">Heatwave watch</option>
               </select>
             </div>
             <div class="map-legend" aria-label="Map legend">
               <span><i class="legend high"></i>Hold</span>
               <span><i class="legend medium"></i>Watch</span>
               <span><i class="legend low"></i>Normal</span>
+              <span><i class="legend heat"></i>Heat index</span>
             </div>
+            <div class="heatwave-map" id="heatwaveMap" aria-label="Live heatwave risk overlay"></div>
             <div class="map" id="sectorMap" aria-label="Operational sector heatmap"></div>
           </article>
 
@@ -168,7 +171,7 @@
             Keep one medical quick-response unit staged at Gate 7 and release three
             volunteer teams from the low-load parking corridor.
           </p>
-          <span class="briefing-source">Synthesized from density, incident SLA, bus GPS, and volunteer check-in feeds.</span>
+          <span class="briefing-source" id="feedStatus">Polling FastAPI live feed for density, heat index, incidents, bus GPS, and volunteer check-ins.</span>
         </section>
       </main>
     </div>

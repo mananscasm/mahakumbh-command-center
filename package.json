@@ -5,6 +5,7 @@
   "description": "Event Operations Command Center Dashboard for Mahakumbh Innovation Hackathon 2028.",
   "scripts": {
     "dev": "npx serve .",
+    "api": "uvicorn api.index:app --reload --port 8000",
     "check": "node --check app.js"
   },
   "keywords": [
