@@ -335,84 +335,70 @@ select {
 }
 
 .legend.heat {
-  background: radial-gradient(circle, #f2b35a 0 35%, rgba(184, 82, 69, 0.2) 70%);
+  background: radial-gradient(circle, #f2b35a 0 28%, rgba(184, 82, 69, 0.8) 56%, rgba(184, 82, 69, 0.18) 72%);
 }
 
-.heatwave-map {
-  background:
-    linear-gradient(rgba(237, 230, 216, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(237, 230, 216, 0.05) 1px, transparent 1px),
-    rgba(237, 230, 216, 0.035);
-  background-size: 38px 38px;
+.crowd-map {
+  background: rgba(237, 230, 216, 0.035);
   border: 1px solid var(--line);
   border-radius: 12px;
-  height: 230px;
+  height: 360px;
   margin-top: 18px;
   overflow: hidden;
   position: relative;
 }
 
-.heatwave-map::after {
-  border: 1px dashed rgba(237, 230, 216, 0.22);
-  content: "";
-  inset: 18px;
-  position: absolute;
-}
-
-.heat-point {
-  align-items: center;
-  border-radius: 999px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 58px;
-  min-width: 58px;
-  padding: 10px;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-}
-
-.heat-point.high {
-  background: radial-gradient(circle, rgba(216, 122, 34, 0.95), rgba(184, 82, 69, 0.44) 58%, rgba(184, 82, 69, 0.08));
-  box-shadow: 0 0 34px rgba(184, 82, 69, 0.42);
-}
-
-.heat-point.medium {
-  background: radial-gradient(circle, rgba(201, 150, 61, 0.9), rgba(201, 150, 61, 0.28) 62%, rgba(201, 150, 61, 0.06));
-}
-
-.heat-point.low {
-  background: radial-gradient(circle, rgba(128, 168, 107, 0.75), rgba(128, 168, 107, 0.2) 62%, rgba(128, 168, 107, 0.04));
-}
-
-.heat-point strong {
+.crowd-map .leaflet-control-attribution,
+.crowd-map .leaflet-control-zoom a {
+  background: rgba(16, 18, 20, 0.88);
+  border-color: var(--line);
   color: var(--text);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.05rem;
-  line-height: 1;
 }
 
-.heat-point span {
-  color: rgba(245, 239, 227, 0.78);
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  margin-top: 5px;
-  text-transform: uppercase;
+.crowd-map .leaflet-tile {
+  filter: grayscale(0.75) brightness(0.58) contrast(1.08);
 }
 
-.heat-label {
-  background: rgba(16, 18, 20, 0.82);
-  border: 1px solid var(--line);
+.crowd-marker {
+  align-items: center;
+  border: 1px solid rgba(245, 239, 227, 0.42);
   border-radius: 999px;
+  color: var(--text);
+  display: flex;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  justify-content: center;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.crowd-marker.high {
+  background: radial-gradient(circle, rgba(216, 122, 34, 0.94), rgba(184, 82, 69, 0.66) 54%, rgba(184, 82, 69, 0.16));
+  box-shadow: 0 0 34px rgba(184, 82, 69, 0.52);
+}
+
+.crowd-marker.medium {
+  background: radial-gradient(circle, rgba(201, 150, 61, 0.86), rgba(201, 150, 61, 0.38) 58%, rgba(201, 150, 61, 0.08));
+}
+
+.crowd-marker.low {
+  background: radial-gradient(circle, rgba(128, 168, 107, 0.78), rgba(128, 168, 107, 0.32) 58%, rgba(128, 168, 107, 0.06));
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--panel);
+  color: var(--text);
+}
+
+.leaflet-popup-content {
   color: var(--muted);
-  font-size: 0.72rem;
-  left: 18px;
-  padding: 7px 10px;
-  position: absolute;
-  top: 18px;
-  z-index: 2;
+  font-size: 0.82rem;
+}
+
+.leaflet-popup-content b {
+  color: var(--text);
 }
 
 .map {

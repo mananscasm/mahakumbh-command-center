@@ -1,20 +1,20 @@
 const sectors = [
-  { name: "Sangam Nose", load: 91, flow: "+12%", risk: "high", heat_index_c: 38.9, x: 18, y: 22 },
-  { name: "Sector 4 Bridge", load: 84, flow: "+9%", risk: "high", heat_index_c: 38.0, x: 50, y: 20 },
-  { name: "Gate 7 Entry", load: 77, flow: "+5%", risk: "medium", heat_index_c: 39.7, x: 82, y: 30 },
-  { name: "Rail Shuttle Hub", load: 69, flow: "-2%", risk: "medium", heat_index_c: 36.6, x: 20, y: 54 },
-  { name: "Medical Post C", load: 58, flow: "+1%", risk: "low", heat_index_c: 40.4, x: 50, y: 54 },
-  { name: "Parking Corridor", load: 42, flow: "-8%", risk: "low", heat_index_c: 41.3, x: 82, y: 62 },
-  { name: "Akhara Route", load: 73, flow: "+4%", risk: "medium", heat_index_c: 37.5, x: 23, y: 82 },
-  { name: "Pontoon East", load: 81, flow: "+7%", risk: "high", heat_index_c: 38.7, x: 52, y: 84 },
-  { name: "Food Court Belt", load: 63, flow: "+3%", risk: "medium", heat_index_c: 39.1, x: 80, y: 84 }
+  { name: "Sangam Nose", load: 91, flow: "+12%", risk: "high", people_estimate: 82000, lat: 25.4307, lng: 81.8848 },
+  { name: "Sector 4 Bridge", load: 84, flow: "+9%", risk: "high", people_estimate: 52000, lat: 25.4268, lng: 81.8726 },
+  { name: "Gate 7 Entry", load: 77, flow: "+5%", risk: "medium", people_estimate: 43000, lat: 25.4388, lng: 81.8618 },
+  { name: "Rail Shuttle Hub", load: 69, flow: "-2%", risk: "medium", people_estimate: 36000, lat: 25.4446, lng: 81.8429 },
+  { name: "Medical Post C", load: 58, flow: "+1%", risk: "low", people_estimate: 12000, lat: 25.4218, lng: 81.8688 },
+  { name: "Parking Corridor", load: 42, flow: "-8%", risk: "low", people_estimate: 26000, lat: 25.4561, lng: 81.8337 },
+  { name: "Akhara Route", load: 73, flow: "+4%", risk: "medium", people_estimate: 48000, lat: 25.4185, lng: 81.8572 },
+  { name: "Pontoon East", load: 81, flow: "+7%", risk: "high", people_estimate: 39000, lat: 25.4243, lng: 81.8918 },
+  { name: "Food Court Belt", load: 63, flow: "+3%", risk: "medium", people_estimate: 28000, lat: 25.4332, lng: 81.8526 }
 ];
 
 const scenarios = {
   normal: { crowd: 72, incidents: 18, bus: 11, volunteers: 86 },
   surge: { crowd: 88, incidents: 29, bus: 18, volunteers: 74 },
   rain: { crowd: 79, incidents: 24, bus: 16, volunteers: 81 },
-  heatwave: { crowd: 80, incidents: 31, bus: 15, volunteers: 79 }
+  peak: { crowd: 91, incidents: 34, bus: 19, volunteers: 72 }
 };
 
 const incidents = [
@@ -55,6 +55,8 @@ const API_BASE =
     ? "http://127.0.0.1:8000"
     : "";
 let livePoll;
+let crowdMap;
+let crowdLayer;
 
 function riskColor(risk) {
   if (risk === "high") return "linear-gradient(135deg, rgba(184,82,69,.46), rgba(91,36,31,.28))";
@@ -66,11 +68,11 @@ function renderSectors(sectorData = sectors, multiplier = 1) {
   byId("sectorMap").innerHTML = sectorData
     .map((sector) => {
       const load = Math.min(98, Math.round(sector.load * multiplier));
-      const heat = sector.heat_index_c ? ` · ${sector.heat_index_c}C heat index` : "";
+      const people = sector.people_estimate ? ` · ${sector.people_estimate.toLocaleString()} people` : "";
       return `
         <div class="sector" style="background:${riskColor(load > 82 ? "high" : load > 64 ? "medium" : "low")}">
           <strong>${sector.name}</strong>
-          <span>${load}% load · ${sector.flow} flow${heat}</span>
+          <span>${load}% load · ${sector.flow} flow${people}</span>
           <div class="load-bar"><i style="width:${load}%"></i></div>
         </div>
       `;
@@ -78,28 +80,53 @@ function renderSectors(sectorData = sectors, multiplier = 1) {
     .join("");
 }
 
-function renderHeatwaveMap(sectorData = sectors, generatedAt = "static demo feed") {
-  const hottest = [...sectorData].sort((a, b) => (b.heat_index_c || 0) - (a.heat_index_c || 0))[0];
-  const timestamp = generatedAt.includes("T")
-    ? new Date(generatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    : generatedAt;
+function initializeCrowdMap() {
+  if (crowdMap || !window.L) return;
+  crowdMap = L.map("crowdMap", {
+    center: [25.4307, 81.8848],
+    zoom: 13,
+    scrollWheelZoom: false
+  });
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    attribution: "&copy; OpenStreetMap"
+  }).addTo(crowdMap);
+  crowdLayer = L.layerGroup().addTo(crowdMap);
+}
 
-  byId("heatwaveMap").innerHTML = `
-    <div class="heat-label">Live heatwave layer · hottest: ${hottest.name} ${hottest.heat_index_c}C · ${timestamp}</div>
-    ${sectorData
-      .map((sector) => {
-        const heat = sector.heat_index_c || 36;
-        const risk = heat >= 41 || sector.risk === "high" ? "high" : heat >= 38 ? "medium" : "low";
-        const size = Math.max(52, Math.min(96, 34 + heat * 1.25));
-        return `
-          <div class="heat-point ${risk}" style="left:${sector.x || 50}%; top:${sector.y || 50}%; width:${size}px; height:${size}px">
-            <strong>${Math.round(heat)}C</strong>
-            <span>${sector.name.split(" ")[0]}</span>
-          </div>
-        `;
-      })
-      .join("")}
-  `;
+function renderCrowdMap(sectorData = sectors, mapCenter = [25.4307, 81.8848]) {
+  initializeCrowdMap();
+  if (!crowdMap || !crowdLayer) {
+    byId("crowdMap").innerHTML = "<div class=\"heat-label\">Map tiles loading. Live crowd data is available in the sector cards below.</div>";
+    return;
+  }
+
+  crowdLayer.clearLayers();
+  crowdMap.setView(mapCenter, 13);
+  sectorData.forEach((sector) => {
+    const load = sector.load || 0;
+    const size = Math.max(34, Math.min(86, 24 + load * 0.72));
+    const marker = L.divIcon({
+      className: "",
+      html: `<div class="crowd-marker ${sector.risk}" style="width:${size}px;height:${size}px">${load}%</div>`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
+    });
+    L.marker([sector.lat, sector.lng], { icon: marker })
+      .bindPopup(
+        `<b>${sector.name}</b><br>${load}% load · ${(sector.people_estimate || 0).toLocaleString()} people<br>${sector.advisory || "Monitor crowd movement."}`
+      )
+      .addTo(crowdLayer);
+
+    L.circle([sector.lat, sector.lng], {
+      radius: 90 + load * 8,
+      color: sector.risk === "high" ? "#b85245" : sector.risk === "medium" ? "#c9963d" : "#80a86b",
+      fillColor: sector.risk === "high" ? "#b85245" : sector.risk === "medium" ? "#c9963d" : "#80a86b",
+      fillOpacity: 0.18,
+      opacity: 0.32,
+      weight: 1
+    }).addTo(crowdLayer);
+  });
 }
 
 function renderIncidents(sortBySla = false) {
@@ -151,8 +178,8 @@ function fallbackBriefing(name) {
     ? "Arrival velocity is above plan near Sangam Nose. Hold two bus batches at the rail shuttle hub, open the Sector 4 release lane, and deploy volunteer marshals before the next 15-minute pulse."
     : name === "rain"
       ? "Rain diversion is pushing people toward covered corridors. Keep the pontoon bridge under one-way control, move water refill crews laterally, and protect medical access at Gate 7."
-      : name === "heatwave"
-        ? "Heat index is crossing safe operating thresholds near Parking Corridor and Medical Post C. Push water carts, shaded holding, and medical patrols before crowd density rises further."
+      : name === "peak"
+        ? "Peak crowd movement is building near Sangam Nose, Sector 4 Bridge, and Gate 7. Hold inflow, protect release corridors, and redeploy volunteers from low-load parking zones."
         : "Crowd pressure is rising near Sangam Nose and Sector 4 pontoon bridge. Keep one medical quick-response unit staged at Gate 7 and release three volunteer teams from the low-load parking corridor.";
 }
 
@@ -162,9 +189,9 @@ function applyLivePayload(payload) {
   byId("busMetric").textContent = `${payload.bus_turnaround_min}m`;
   byId("volunteerMetric").textContent = `${payload.volunteer_coverage}%`;
   byId("briefingText").textContent = payload.briefing;
-  byId("feedStatus").textContent = `FastAPI live feed · ${payload.sectors.length} sectors · generated ${new Date(payload.generated_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
-  renderSectors(payload.sectors);
-  renderHeatwaveMap(payload.sectors, payload.generated_at);
+  byId("feedStatus").textContent = `FastAPI live crowd feed · ${payload.zones.length} zones · generated ${new Date(payload.generated_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+  renderSectors(payload.zones);
+  renderCrowdMap(payload.zones, payload.map_center);
 }
 
 async function fetchLiveOperations(name) {
@@ -179,13 +206,13 @@ async function fetchLiveOperations(name) {
 
 function applyScenario(name) {
   const scenario = scenarios[name];
-  const multiplier = name === "surge" ? 1.16 : name === "rain" ? 1.08 : 1;
+  const multiplier = name === "surge" ? 1.16 : name === "rain" ? 1.08 : name === "peak" ? 1.22 : 1;
   byId("crowdMetric").textContent = `${scenario.crowd}%`;
   byId("incidentMetric").textContent = scenario.incidents;
   byId("busMetric").textContent = `${scenario.bus}m`;
   byId("volunteerMetric").textContent = `${scenario.volunteers}%`;
   renderSectors(sectors, multiplier);
-  renderHeatwaveMap(sectors);
+  renderCrowdMap(sectors);
   byId("briefingText").textContent = fallbackBriefing(name);
   byId("feedStatus").textContent = "Static fallback feed active. Start FastAPI locally or deploy on Vercel for live polling.";
 }
@@ -263,7 +290,7 @@ byId("submitIncidentBtn").addEventListener("click", addIncident);
 byId("downloadBriefBtn").addEventListener("click", exportBrief);
 
 renderSectors();
-renderHeatwaveMap();
+renderCrowdMap();
 renderIncidents();
 renderResources();
 renderActions();

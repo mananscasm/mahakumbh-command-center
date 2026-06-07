@@ -8,6 +8,12 @@
       content="Centralized event operations command center dashboard for Mahakumbh 2028."
     />
     <title>Sangam Setu Command Center</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIINfQ8M6M8YxT9lTq9gtatowRjN6j5N2z4="
+      crossorigin=""
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -101,16 +107,16 @@
                 <option value="normal">Morning flow</option>
                 <option value="surge">Royal bath surge</option>
                 <option value="rain">Rain diversion</option>
-                <option value="heatwave">Heatwave watch</option>
+                <option value="peak">Peak crowd watch</option>
               </select>
             </div>
             <div class="map-legend" aria-label="Map legend">
               <span><i class="legend high"></i>Hold</span>
               <span><i class="legend medium"></i>Watch</span>
               <span><i class="legend low"></i>Normal</span>
-              <span><i class="legend heat"></i>Heat index</span>
+              <span><i class="legend heat"></i>Crowd density</span>
             </div>
-            <div class="heatwave-map" id="heatwaveMap" aria-label="Live heatwave risk overlay"></div>
+            <div class="crowd-map" id="crowdMap" aria-label="Live crowd heatmap on Prayagraj map"></div>
             <div class="map" id="sectorMap" aria-label="Operational sector heatmap"></div>
           </article>
 
@@ -171,7 +177,7 @@
             Keep one medical quick-response unit staged at Gate 7 and release three
             volunteer teams from the low-load parking corridor.
           </p>
-          <span class="briefing-source" id="feedStatus">Polling FastAPI live feed for density, heat index, incidents, bus GPS, and volunteer check-ins.</span>
+          <span class="briefing-source" id="feedStatus">Polling FastAPI live feed for crowd density, incidents, bus GPS, and volunteer check-ins.</span>
         </section>
       </main>
     </div>
@@ -211,6 +217,11 @@
       </form>
     </dialog>
 
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -13,8 +13,8 @@ Large pilgrimage events create fast-changing operational pressure: crowd density
 ## Product Highlights
 
 - Live command overview with crowd load, open incidents, transport turnaround, and volunteer coverage
-- Sector heatmap for crowd movement and pressure zones
-- Real-time heatwave layer powered by a FastAPI live feed
+- Real map-based live crowd heatmap for movement and pressure zones
+- FastAPI live feed with crowd-density points, coordinates, estimated headcount, and risk level
 - Scenario switcher for morning flow, royal bath surge, and rain diversion
 - Incident priority queue with SLA sorting and quick incident logging
 - Deployment board for medical teams, volunteers, police, buses, and water points
@@ -24,7 +24,7 @@ Large pilgrimage events create fast-changing operational pressure: crowd density
 ## Tech Stack
 
 - HTML, CSS, and JavaScript
-- FastAPI + Python for live operations and heatwave telemetry
+- FastAPI + Python for live operations and crowd-density telemetry
 - Vercel for static frontend and serverless API deployment
 - Static fallback data for demos when the API is offline
 
